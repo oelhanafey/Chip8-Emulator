@@ -1,6 +1,8 @@
 class chip8 {
   unsigned short opcode;
   unsigned char memory[4096];
+  //Registers
+  //V[0] = V0 -> V[16] = VF
   unsigned char V[16];
   unsigned short I;
   unsigned short pc;
@@ -12,6 +14,7 @@ class chip8 {
   unsigned char key[16];
 
   public:
+    //initialize registers and memory
     void initialize();
 
     void cycle();
