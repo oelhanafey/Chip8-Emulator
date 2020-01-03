@@ -18,4 +18,6 @@ class chip8 {
     void initialize();
 
     void cycle();
+
+    void load(string game);
 };

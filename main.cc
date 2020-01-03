@@ -4,6 +4,7 @@
 int main(void) {
   chip8 cpu;
   cpu.initialize();
+  
   //setup graphics
   //setup input
 
