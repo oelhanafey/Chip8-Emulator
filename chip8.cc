@@ -28,7 +28,7 @@ void chip8::initialize() {
   }
 
   //Load fontset
-  unsigned char chip8_fontset[80] =
+  uint8_t chip8_fontset[80] =
   {
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
     0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -55,10 +55,11 @@ void chip8::initialize() {
 }
 
 void chip8::cycle() {
+  std::cerr << "chip8::cycle() run" << std::endl;
   //fetch opcode
   opcode = memory[pc] << 8 | memory[pc + 1];
   //decode opcode
-  
+
 
   //execute opcode
 
@@ -66,6 +67,6 @@ void chip8::cycle() {
 
 }
 
-void chip8::load(string game) {
+void chip8::load() {
 
 }
