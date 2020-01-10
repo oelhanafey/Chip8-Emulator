@@ -9,10 +9,12 @@ class chip8 {
   uint16_t I;
   uint16_t pc;
   uint8_t gfx[64][32];
-  uint8_t delay_timer;
-  uint8_t sound_timer;
+  uint8_t delayTimer;
+  uint8_t soundTimer;
   uint16_t stack[16];
   uint8_t sp;
+
+  bool drawFlag;
 
 
   public:
@@ -22,4 +24,6 @@ class chip8 {
     void cycle();
 
     void load();
+
+    void opcodeHandler();
 };
