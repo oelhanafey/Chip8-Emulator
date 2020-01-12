@@ -1,5 +1,10 @@
+#ifndef KEY
+#define KEY
+
 class Keyboard {
+  public:
   bool keys[16];
+  bool exit = false;
 
 public:
 
@@ -16,3 +21,5 @@ private:
   void resetKeys();
 
 };
+
+#endif

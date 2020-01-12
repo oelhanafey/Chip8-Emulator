@@ -45,3 +45,11 @@ void Screen::drawPixel(int x, int y) {
     // Render the rect to the screen
     SDL_RenderPresent(renderer);
 }
+
+void Screen::drawScreen(uint8_t gfx[]) {
+    for(int x=0; x<64;x++) {
+        for(int y=0;y<32;y++) {
+            if(gfx[x + (y*64)] == 1) drawPixel(x,y);
+        }
+    }
+}

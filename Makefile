@@ -1,5 +1,5 @@
 main: main.o chip8.o keyboard.o screen.o
-	g++ -o main main.o chip8.o keyboard.o -lSDL2
+	g++ -o main main.o chip8.o keyboard.o screen.o -lSDL2
 
 main.o: main.cc chip8.h keyboard.h screen.h
 	g++ -c main.cc

@@ -15,11 +15,10 @@ void Chip8::initialize() {
   drawFlag = false;
 
   //Clear display
-  for(int i=0; i<64;i++) {
-    for(int j=0; j<32; j++) {
-      gfx[i][j] = 0;
-    }
+  for(int i=0; i<64*32;i++) {
+    gfx[i] = 0;
   }
+
 
   //Clear stack
   for(int i=0; i<16; i++) {
@@ -36,7 +35,7 @@ void Chip8::initialize() {
   }
 
   key = new Keyboard();
-  screen = new Screen();
+  display = new Screen();
 
   //Load fontset
   uint8_t chip8_fontset[80] =
@@ -67,7 +66,7 @@ void Chip8::initialize() {
 
 void Chip8::destroy() {
   free(key);
-  free(screen);
+  free(display);
 }
 
 void Chip8::cycle() {
@@ -78,7 +77,7 @@ void Chip8::cycle() {
   opcodeHandler();
 
   //update timers
-
+  SDL_Delay(100);
 }
 
 void Chip8::opcodeHandler() {
@@ -88,10 +87,8 @@ void Chip8::opcodeHandler() {
       switch(opcode & 0x000F) {
         case(0x0000):
           //00E0 - Clear the display
-          for(int j=0;j<64;j++) {
-            for(int k=0;k<32;k++) {
-              gfx[j][k]= 0;
-            }
+          for(int j=0;j<2048;j++) {
+            gfx[j] = 0;
           }
           pc += 2;
           drawFlag = true;
@@ -101,6 +98,7 @@ void Chip8::opcodeHandler() {
           //00EE - Return from a subroutine
           sp--;
           pc = stack[sp];
+          pc += 2;
           break;
       }
 
@@ -240,12 +238,7 @@ void Chip8::opcodeHandler() {
           x = (opcode & 0x0F00) >> 8;
           y = (opcode & 0x00F0) >> 4;
           //If least significant digit = 1
-          if((V[x] & 0x01) == 1) {
-            V[0xF] = 1;
-          }
-          else {
-            V[0xF] = 0;
-          }
+          V[0xF] = V[x] & 0x1;
           V[x] >>= 1;
 
           pc += 2;
@@ -315,29 +308,32 @@ void Chip8::opcodeHandler() {
       break;
     case(0xD000):
       //DXYN - Display n-byte sprite starting at memory location I at (VX,VY), set VF = collision
-      x = (opcode & 0x0F00) >> 8;
-      y = (opcode & 0x00F0) >> 4;
-      n = opcode & 0x000F;
-      uint8_t sprite;
+      x = V[(opcode & 0x0F00) >> 8];
+			y = V[(opcode & 0x00F0) >> 4];
+			n = opcode & 0x000F;
+			unsigned short pixel;
 
-      V[0xF] = 0;
-      //draw N rows
-      for(int j=0; j<n; j++) {
-        sprite = memory[I+j];
-        for(int k=0; k<8; k++) {
-          //check 1 bit at a time
-          if((sprite & (0x80 >> k)) != 0) {
-              if(gfx[y+j][x+k] == 1) {
-                V[0xF] = 1;
-              }
-              gfx[y+j][x+k] ^= 1;
-          }
-        }
-      }
+			V[0xF] = 0;
+			for (int yline = 0; yline < n; yline++)
+			{
+				pixel = memory[I + yline];
+				for(int xline = 0; xline < 8; xline++)
+				{
+					if((pixel & (0x80 >> xline)) != 0)
+					{
+						if(gfx[(x + xline + ((y + yline) * 64))] == 1)
+						{
+							V[0xF] = 1;
+						}
+						gfx[x + xline + ((y + yline) * 64)] ^= 1;
+					}
+				}
+			}
 
-      drawFlag = true;
-      pc += 2;
-      break;
+			drawFlag = true;
+			pc += 2;
+
+		break;
     case(0xE000):
       switch(opcode & 0x00FF) {
         case(0x009E):
@@ -401,6 +397,13 @@ void Chip8::opcodeHandler() {
         case(0x001E):
           //FX1E - Set I = I + VX
           x = (opcode & 0x0F00) >> 8;
+          n = I + V[x];
+          if(n > 0xFFF) {
+            V[0xF] = 1;
+          }
+          else {
+            V[0xF] = 0;
+          }
           I = I + V[x];
 
           pc += 2;
@@ -408,56 +411,7 @@ void Chip8::opcodeHandler() {
         case(0x0029):
           //FX29 - Set I = location of sprite for digit VX
           x = (opcode & 0x0F00) >> 8;
-          switch(x) {
-            case(0):
-              I = memory[0];
-              break;
-            case(1):
-              I = memory[5];
-            break;
-            case(2):
-              I = memory[10];
-              break;
-            case(3):
-              I = memory[15];
-              break;
-            case(4):
-              I = memory[20];
-              break;
-            case(5):
-              I = memory[25];
-              break;
-            case(6):
-              I = memory[30];
-              break;
-            case(7):
-              I = memory[35];
-              break;
-            case(8):
-              I = memory[40];
-              break;
-            case(9):
-              I = memory[45];
-              break;
-            case(0xA):
-              I = memory[50];
-              break;
-            case(0xB):
-              I = memory[55];
-              break;
-            case(0xC):
-              I = memory[60];
-              break;
-            case(0xD):
-              I = memory[65];
-              break;
-            case(0xE):
-              I = memory[70];
-              break;
-            case(0xF):
-              I = memory[75];
-              break;
-          }
+          I = V[x] * 5;
 
           pc += 2;
 
@@ -467,7 +421,7 @@ void Chip8::opcodeHandler() {
           x = (opcode & 0x0F00) >> 8;
           memory[I] = V[x] / 100;
           memory[I+1] = (V[x] / 10) % 10;
-          memory[I+2] = V[x] % 10;
+          memory[I+2] = (V[x] % 100) % 10;
 
           pc += 2;
           break;
@@ -478,7 +432,7 @@ void Chip8::opcodeHandler() {
             memory[I+j] = V[j];
           }
 
-
+          I += x + 1;
           pc += 2;
           break;
         case(0x0065):
@@ -488,6 +442,7 @@ void Chip8::opcodeHandler() {
             V[j] = memory[I+j];
           }
 
+          I += x + 1;
           pc += 2;
           break;
 

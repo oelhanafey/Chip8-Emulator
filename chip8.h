@@ -1,3 +1,6 @@
+#ifndef CHIP
+#define CHIP
+
 #include <cstdint>
 #include <vector>
 #include <fstream>
@@ -13,7 +16,7 @@ class Chip8 {
   uint8_t V[16];
   uint16_t I;
   uint16_t pc;
-  uint8_t gfx[64][32];
+  uint8_t gfx[64*32];
   uint8_t delayTimer;
   uint8_t soundTimer;
   uint16_t stack[16];
@@ -21,7 +24,7 @@ class Chip8 {
   bool drawFlag;
 
   Keyboard* key;
-  Screen* screen;
+  Screen* display;
 
 
   public:
@@ -43,3 +46,5 @@ class Chip8 {
   private:
     std::vector<uint8_t> readFile(const char* prog);
 };
+
+#endif

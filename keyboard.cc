@@ -25,7 +25,7 @@ void Keyboard::keyPressHandler() {
   while(SDL_PollEvent(&event)) {
     switch(event.type) {
       case SDL_QUIT:
-        //quit
+        exit = true;
       break;
       case SDLK_1:
         keys[1] = true;
