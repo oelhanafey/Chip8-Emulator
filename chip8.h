@@ -1,5 +1,6 @@
 #include <cstdint>
 #include "keyboard.h"
+#include "screen.h"
 
 class chip8 {
   uint16_t opcode;
@@ -14,20 +15,25 @@ class chip8 {
   uint8_t soundTimer;
   uint16_t stack[16];
   uint8_t sp;
+  bool drawFlag;
 
   Keyboard* key;
-  bool drawFlag;
+  Screen* screen;
 
 
   public:
     //initialize registers and memory
     void initialize();
 
+    //Compute one cpu cycle
     void cycle();
 
+    //Load program into memory
     void load();
 
+    //Decode and execute current opcode
     void opcodeHandler();
 
+    //Free used memory
     void destroy();
 };

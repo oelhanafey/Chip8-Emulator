@@ -36,6 +36,7 @@ void chip8::initialize() {
   }
 
   key = new Keyboard();
+  screen = new Screen();
 
   //Load fontset
   uint8_t chip8_fontset[80] =
@@ -66,6 +67,7 @@ void chip8::initialize() {
 
 void chip8::destroy() {
   free(key);
+  free(screen);
 }
 
 void chip8::cycle() {

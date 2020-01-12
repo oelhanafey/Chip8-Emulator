@@ -12,6 +12,7 @@ public:
   void keyPressHandler();
 
 private:
+  //Set all keys in array to false
   void resetKeys();
 
 };
