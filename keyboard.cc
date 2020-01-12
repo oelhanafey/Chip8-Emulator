@@ -31,19 +31,18 @@ void Keyboard::keyPressHandler() {
       case(SDL_KEYDOWN):
       switch(event.key.keysym.sym) {
         case SDLK_1:
-        keys[0] = true;
-        break;
-        case SDLK_2:
         keys[1] = true;
         break;
-        case SDLK_3:
+        case SDLK_2:
         keys[2] = true;
         break;
-        case SDLK_4:
+        case SDLK_3:
         keys[3] = true;
         break;
+        case SDLK_4:
+        keys[0xC] = true;
+        break;
         case SDLK_q:
-        std::cout << "TEST";
         keys[4] = true;
         break;
         case SDLK_w:
@@ -53,31 +52,31 @@ void Keyboard::keyPressHandler() {
         keys[6] = true;
         break;
         case SDLK_r:
-        keys[7] = true;
+        keys[0xD] = true;
         break;
         case SDLK_a:
-        keys[8] = true;
+        keys[7] = true;
         break;
         case SDLK_s:
-        keys[9] = true;
+        keys[8] = true;
         break;
         case SDLK_d:
-        keys[10] = true;
+        keys[9] = true;
         break;
         case SDLK_f:
-        keys[11] = true;
+        keys[0xE] = true;
         break;
         case SDLK_z:
-        keys[12] = true;
+        keys[0xA] = true;
         break;
         case SDLK_x:
-        keys[13] = true;
+        keys[0] = true;
         break;
         case SDLK_c:
-        keys[14] = true;
+        keys[0xB] = true;
         break;
         case SDLK_v:
-        keys[15] = true;
+        keys[0xF] = true;
         break;
       }
     }
