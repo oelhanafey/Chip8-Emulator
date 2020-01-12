@@ -28,7 +28,7 @@ void Screen::clearScreen() {
     SDL_RenderClear(renderer );
 }
 
-void Screen::drawRect(int x, int y) {
+void Screen::drawPixel(int x, int y) {
     //Create rect
     SDL_Rect r;
     r.x = x * 10;

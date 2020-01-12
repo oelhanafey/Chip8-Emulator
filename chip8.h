@@ -1,8 +1,11 @@
 #include <cstdint>
+#include <vector>
+#include <fstream>
 #include "keyboard.h"
 #include "screen.h"
 
-class chip8 {
+class Chip8 {
+  public:
   uint16_t opcode;
   uint8_t memory[4096];
   //Registers
@@ -28,12 +31,15 @@ class chip8 {
     //Compute one cpu cycle
     void cycle();
 
-    //Load program into memory
-    void load();
+    //Load specified program into memory
+    void load(const char* prog);
 
     //Decode and execute current opcode
     void opcodeHandler();
 
     //Free used memory
     void destroy();
+
+  private:
+    std::vector<uint8_t> readFile(const char* prog);
 };

@@ -2,7 +2,7 @@
 //temp for debug
 #include <iostream>
 
-void chip8::initialize() {
+void Chip8::initialize() {
   //For debug
   std::cerr << "chip8::initialize() run" << std::endl;
 
@@ -65,25 +65,23 @@ void chip8::initialize() {
 
 }
 
-void chip8::destroy() {
+void Chip8::destroy() {
   free(key);
   free(screen);
 }
 
-void chip8::cycle() {
+void Chip8::cycle() {
   std::cerr << "chip8::cycle() run" << std::endl;
   //fetch opcode
   opcode = (memory[pc] << 8) | memory[pc + 1];
   //decode opcode
   opcodeHandler();
 
-  //execute opcode
-
   //update timers
 
 }
 
-void chip8::opcodeHandler() {
+void Chip8::opcodeHandler() {
   int x,y,nnn,kk,n;
   switch(opcode & 0xF000) {
     case(0x0000):
@@ -502,6 +500,27 @@ void chip8::opcodeHandler() {
 }
 
 
-void chip8::load() {
+std::vector<uint8_t> Chip8::readFile(const char* prog) {
+    // open the file:
+    std::streampos fileSize;
+    std::ifstream file(prog, std::ios::binary);
+
+    // get its size:
+    file.seekg(0, std::ios::end);
+    fileSize = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    // read the data:
+    std::vector<uint8_t> fileData(fileSize);
+    file.read((char*) &fileData[0], fileSize);
+    return fileData;
+}
+
+void Chip8::load(const char* prog) {
+  std::vector<uint8_t> data = readFile(prog);
+
+  for(int i=0; i<data.size(); i++) {
+    memory[i + 0x200] = data.at(i);
+  }
 
 }
