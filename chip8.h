@@ -1,4 +1,5 @@
 #include <cstdint>
+#include "keyboard.h"
 
 class chip8 {
   uint16_t opcode;
@@ -14,6 +15,7 @@ class chip8 {
   uint16_t stack[16];
   uint8_t sp;
 
+  Keyboard* key;
   bool drawFlag;
 
 
@@ -26,4 +28,6 @@ class chip8 {
     void load();
 
     void opcodeHandler();
+
+    void destroy();
 };

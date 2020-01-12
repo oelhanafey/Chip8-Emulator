@@ -35,6 +35,8 @@ void chip8::initialize() {
     V[i] = 0x0;
   }
 
+  key = new Keyboard();
+
   //Load fontset
   uint8_t chip8_fontset[80] =
   {
@@ -60,6 +62,10 @@ void chip8::initialize() {
     memory[i] = chip8_fontset[i];
   }
 
+}
+
+void chip8::destroy() {
+  free(key);
 }
 
 void chip8::cycle() {
@@ -147,7 +153,7 @@ void chip8::opcodeHandler() {
       x = (opcode & 0x0F00) >> 8;
       kk = (opcode & 0x00FF);
 
-      V[x] = (short)kk;
+      V[x] = kk;
 
       pc += 2;
 
@@ -203,7 +209,7 @@ void chip8::opcodeHandler() {
           y = (opcode & 0x00F0) >> 4;
           n = V[x] + V[y];
 
-          //Simulate overflow
+          //Check overflow
           if(n > 0xFF) {
             V[0xF] = 1;
           }
@@ -336,10 +342,18 @@ void chip8::opcodeHandler() {
       switch(opcode & 0x00FF) {
         case(0x009E):
           //EX9E - Skip next instruction if key with value VX is pressed
+          x = (opcode & 0x0F00) >> 8;
+          if(key->isKeyPressed(x)) {
+            pc += 2;
+          }
           pc += 2;
           break;
         case(0x00A1):
           //EXA1 - Skip next instruction if key with value VX is not pressed
+          x = (opcode & 0x0F00) >> 8;
+          if(key->isKeyPressed(x)) {
+            pc += 2;
+          }
           pc += 2;
           break;
         }
@@ -355,10 +369,18 @@ void chip8::opcodeHandler() {
         case(0x000A):
           //FX0A - Wait for key press, store value of key in VX
           x = (opcode & 0x0F00) >> 8;
-          //Wait for key press
+          n=0;
 
-          //store
+          for(int i=0; i<16;i++) {
+            if(key->isKeyPressed(i)) {
+              V[x] = i;
+              n=1;
+            }
+          }
 
+          if(n == 0) {
+            pc -= 2;
+          }
 
           pc += 2;
           break;
