@@ -11,7 +11,7 @@ int main(void) {
   cpu.display->initScreen();
 
   //load game into memory
-  cpu.load("Pong.ch8");
+  cpu.load("TRON.ch8");
 
   //loop
   while(!cpu.key->exit) {

@@ -70,14 +70,23 @@ void Chip8::destroy() {
 }
 
 void Chip8::cycle() {
-  std::cerr << "chip8::cycle() run" << std::endl;
   //fetch opcode
   opcode = (memory[pc] << 8) | memory[pc + 1];
   //decode opcode
   opcodeHandler();
 
   //update timers
-  SDL_Delay(100);
+  SDL_Delay(10);
+  if(delayTimer != 0) {
+      delayTimer--;
+  }
+  if(soundTimer != 0) {
+      soundTimer--;
+      if(soundTimer == 0) {
+        //beep
+      }
+  }
+
 }
 
 void Chip8::opcodeHandler() {
