@@ -11,7 +11,7 @@ int main(void) {
   cpu.display->initScreen();
 
   //load game into memory
-  cpu.load("TRON.ch8");
+  cpu.load("prog/Pong.ch8");
 
   //loop
   while(!cpu.key->exit) {
@@ -23,7 +23,7 @@ int main(void) {
       cpu.display->drawScreen(cpu.gfx);
       cpu.drawFlag = false;
     }
-
+    SDL_Delay(10);
     //Check keys
     cpu.key->keyPressHandler();
   }
