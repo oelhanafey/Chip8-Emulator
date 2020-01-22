@@ -19,7 +19,9 @@ cd Chip8-Emulator
 make
 ```
 ### Usage
-Download any Chip8 roms you would like and place them in the root Chip8-Emulator folder, then in the command-line write:
+Download any Chip8 roms you would like and place them in the root Chip8-Emulator folder. I have put a sample brick breaker rom in the repository.
+
+ In the command-line write:
 
 `./chip8 [ROM NAME]`
 
