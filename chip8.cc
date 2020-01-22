@@ -27,15 +27,15 @@ void Chip8::initialize() {
 
   //initialize all memory to 0
   for(int i=0; i<4096; i++) {
-    memory[i] = 0x0;
+    memory[i] = 0;
   }
   //initialize all registers to 0
   for(int i=0; i<16; i++) {
-    V[i] = 0x0;
+    V[i] = 0;
   }
 
-  key = new Keyboard();
-  display = new Screen();
+
+
 
   //Load fontset
   uint8_t chip8_fontset[80] =
@@ -62,11 +62,31 @@ void Chip8::initialize() {
     memory[i] = chip8_fontset[i];
   }
 
+  screen = new Screen();
+  key = new Keyboard();
+
+
 }
 
 void Chip8::destroy() {
   free(key);
-  free(display);
+  free(screen);
+}
+
+Keyboard* Chip8::getKeyboard() {
+  return key;
+}
+
+Screen* Chip8::getScreen() {
+  return screen;
+}
+
+bool Chip8::getDrawFlag() {
+  return drawFlag;
+}
+
+void Chip8::setDrawFlag(bool set) {
+  drawFlag = set;
 }
 
 void Chip8::cycle() {
@@ -76,16 +96,9 @@ void Chip8::cycle() {
   opcodeHandler();
 
   //update timers
-  SDL_Delay(10);
-  if(delayTimer != 0) {
-      delayTimer--;
-  }
-  if(soundTimer != 0) {
-      soundTimer--;
-      if(soundTimer == 0) {
-        //beep
-      }
-  }
+  delayTimer--;
+  soundTimer--;
+
 
 }
 
@@ -347,20 +360,22 @@ void Chip8::opcodeHandler() {
       switch(opcode & 0x00FF) {
         case(0x009E):
           //EX9E - Skip next instruction if key with value VX is pressed
-          x = (opcode & 0x0F00) >> 8;
-          if(key->isKeyPressed(x)) {
-            pc += 2;
-          }
-          pc += 2;
-          break;
-        case(0x00A1):
-          //EXA1 - Skip next instruction if key with value VX is not pressed
-          x = (opcode & 0x0F00) >> 8;
-          if(key->isKeyPressed(x)) {
-            pc += 2;
-          }
-          pc += 2;
-          break;
+          x = V[(opcode & 0x0F00) >> 8];
+              if (key->isKeyPressed(x))
+                  pc +=  4;
+              else
+                  pc += 2;
+              break;
+
+          // EXA1 - Skips the next instruction if the key stored
+          // in VX isn't pressed.
+          case 0x00A1:
+          x = V[(opcode & 0x0F00) >> 8];
+              if(!key->isKeyPressed(x))
+                  pc +=  4;
+              else
+                  pc += 2;
+              break;
         }
       break;
     case(0xF000):
@@ -373,22 +388,26 @@ void Chip8::opcodeHandler() {
           break;
         case(0x000A):
           //FX0A - Wait for key press, store value of key in VX
-          x = (opcode & 0x0F00) >> 8;
-          n=0;
+          {
+              bool key_pressed = false;
+              x = V[(opcode & 0x0F00) >> 8];
+              for(int i = 0; i < 16; ++i)
+              {
+                  if(key->isKeyPressed(i))
+                  {
+                      V[x] = i;
+                      key_pressed = true;
+                  }
+              }
 
-          for(int i=0; i<16;i++) {
-            if(key->isKeyPressed(i)) {
-              V[x] = i;
-              n=1;
-            }
+              // If no key is pressed, return and try again.
+              if(!key_pressed) {
+                pc -= 2;
+              }
+
+              pc += 2;
           }
-
-          if(n == 0) {
-            pc -= 2;
-          }
-
-          pc += 2;
-          break;
+              break;
         case(0x0015):
           //FX15 - Set delay timer = VX
           x = (opcode & 0x0F00) >> 8;
@@ -430,7 +449,7 @@ void Chip8::opcodeHandler() {
           x = (opcode & 0x0F00) >> 8;
           memory[I] = V[x] / 100;
           memory[I+1] = (V[x] / 10) % 10;
-          memory[I+2] = (V[x] % 100) % 10;
+          memory[I+2] =   V[x] % 10;
 
           pc += 2;
           break;
@@ -464,7 +483,7 @@ void Chip8::opcodeHandler() {
 }
 
 
-std::vector<uint8_t> Chip8::readFile(const char* prog) {
+std::vector<uint8_t> Chip8::readFile(char* prog) {
     // open the file:
     std::streampos fileSize;
     std::ifstream file(prog, std::ios::binary);
@@ -480,7 +499,7 @@ std::vector<uint8_t> Chip8::readFile(const char* prog) {
     return fileData;
 }
 
-void Chip8::load(const char* prog) {
+void Chip8::load(char* prog) {
   std::vector<uint8_t> data = readFile(prog);
 
   for(int i=0; i<data.size(); i++) {

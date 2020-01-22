@@ -1,33 +1,43 @@
 #include <iostream>
-#include "chip8.h"
-#include "screen.h"
+#include <chrono>
+#include <thread>
+#include "stdint.h"
 #include "SDL2/SDL.h"
+#include "chip8.h"
 
-int main(void) {
-  Chip8 cpu;
-  cpu.initialize();
+using namespace std;
 
-  //setup graphics
-  cpu.display->initScreen();
 
-  //load game into memory
-  cpu.load("prog/Pong.ch8");
+int main(int argc, char **argv) {
 
-  //loop
-  while(!cpu.key->exit) {
-    //Cycle cpu
-    cpu.cycle();
-
-    //If draw flag is set then draw screen
-    if(cpu.drawFlag) {
-      cpu.display->drawScreen(cpu.gfx);
-      cpu.drawFlag = false;
+    // If no ROM given
+    if (argc != 2) {
+        cout << "Usage: chip8 <ROM file>" << endl;
+        return 1;
     }
-    SDL_Delay(10);
-    //Check keys
-    cpu.key->keyPressHandler();
-  }
+
+    //Initialize Chip8 and screen
+    Chip8 chip8;
+    chip8.initialize();
+    chip8.getScreen()->initScreen();
 
 
-  return 0;
+    chip8.load(argv[1]);
+
+    while (!chip8.getKeyboard()->isExit()) {
+        chip8.cycle();
+        chip8.getKeyboard()->keyPressHandler();
+
+        //if drawflag is set, redraw screen
+        if (chip8.getDrawFlag()) {
+            chip8.setDrawFlag(false);
+            chip8.getScreen()->drawScreen(chip8.gfx);
+        }
+
+        //Slow down cpu
+        std::this_thread::sleep_for(std::chrono::microseconds(1200));
+
+    }
+
+    chip8.destroy();
 }

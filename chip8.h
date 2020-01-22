@@ -8,26 +8,32 @@
 #include "screen.h"
 
 class Chip8 {
-  public:
+private:
   uint16_t opcode;
   uint8_t memory[4096];
   //Registers
   //V[0] = V0 -> V[16] = VF
   uint8_t V[16];
+  //Index pointer
   uint16_t I;
   uint16_t pc;
-  uint8_t gfx[64*32];
+
   uint8_t delayTimer;
   uint8_t soundTimer;
   uint16_t stack[16];
+  //stack pointer
   uint8_t sp;
+
+  Keyboard*  key;
+  Screen* screen;
+  //Set to true when cpu should redraw screen
   bool drawFlag;
 
-  Keyboard* key;
-  Screen* display;
+public:
 
+    //Graphics
+    uint8_t gfx[64 * 32];
 
-  public:
     //initialize registers and memory
     void initialize();
 
@@ -35,7 +41,7 @@ class Chip8 {
     void cycle();
 
     //Load specified program into memory
-    void load(const char* prog);
+    void load(char* prog);
 
     //Decode and execute current opcode
     void opcodeHandler();
@@ -43,8 +49,22 @@ class Chip8 {
     //Free used memory
     void destroy();
 
+    //return key
+    Keyboard* getKeyboard();
+
+    //return screen
+    Screen* getScreen();
+
+    //return drawFlag
+    bool getDrawFlag();
+
+    //set drawFlag to set
+    void setDrawFlag(bool set);
+
+
   private:
-    std::vector<uint8_t> readFile(const char* prog);
+    //wrapped function for load
+    std::vector<uint8_t> readFile(char* prog);
 };
 
 #endif

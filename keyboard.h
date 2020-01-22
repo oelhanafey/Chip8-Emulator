@@ -2,7 +2,7 @@
 #define KEY
 
 class Keyboard {
-  public:
+private:
   bool keys[16];
   bool exit = false;
 
@@ -12,6 +12,9 @@ public:
 
   //Return true if 'key is currently pressed
   bool isKeyPressed(int key);
+
+  //Return exit parameter
+  bool isExit();
 
   //Decode key press input and update keys array
   void keyPressHandler();

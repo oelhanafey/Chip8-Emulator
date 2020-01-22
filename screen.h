@@ -2,20 +2,16 @@
 #ifndef SCREEN
 #define SCREEN
 class Screen {
+private:
     SDL_Window* window;
     SDL_Renderer* renderer;
+    SDL_Texture* texture;
+    int pixels[2048];
 
     public:
-    //Initiate the window and renderer
+    //Initiate the screen
     void initScreen();
-
-    //Clear the screen
-    void clearScreen();
-
-    //Draw a rectangle to represent specified pixel
-    //Domain: x = 64 pixels, y = 32 pixels
-    void drawPixel(int x,int y);
-
+    //Draw the pixels in gfx to the screen
     void drawScreen(uint8_t gfx[64*32]);
 };
 #endif
