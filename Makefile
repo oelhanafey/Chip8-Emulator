@@ -14,4 +14,4 @@ screen.o: screen.cc screen.h
 	g++ -c screen.cc
 
 clean:
-	rm main main.o chip8.o keyboard.o screen.o
+	rm chip8 main.o chip8.o keyboard.o screen.o
